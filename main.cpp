@@ -1,25 +1,11 @@
 #include <iostream>
-#include <SDL.h>
+
+#include "game/game.h"
 
 int main(int argc, char* argv[]) {
-    bool running = true;
+    // Get our Game singleton instance.
+    Game* game = Game::getInstance();
 
-    SDL_Event event;
-    SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
-
-    SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
-
-    while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
-        }
-    }
-
-    SDL_Quit();
-
-    return 0;
+    // Run the game loop and wait for it to exit.
+    return game->gameLoop();
 }
