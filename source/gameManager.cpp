@@ -18,6 +18,7 @@ GameManager::GameManager() {
     this->window = nullptr;
     this->renderer = nullptr;
     this->player = nullptr;
+    this->pathfinder = new PathfindingSystem();
     this->currentLevelIndex = 0;
     this->currentGameState = GameState::LOADING_LEVEL;
 
@@ -59,7 +60,9 @@ bool GameManager::initSystems(const char* title, int xpos, int ypos, int width, 
 GameManager::~GameManager() {
     std::cout << "GameManager destructor called" << std::endl;
     delete this->player;
+    delete this->pathfinder;
     this->player = nullptr;
+    this->pathfinder = nullptr;
     for (Enemy* enemy : this->enemies) { delete enemy; } this->enemies.clear();
 }
 
@@ -96,7 +99,7 @@ void GameManager::loadLevel(int levelIndex) {
             enemies.push_back(newEnemy);
         } else { std::cerr << "Could not place enemy on level " << levelIndex+1 << ". Check map/config." << std::endl; }
     }
-    if (player) { playerWavefront = pathfinder.generateWavefrontMap(getPlayerTilePos(), gameMap); }
+    if (player) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     setGameState(GameState::PLAYING);
     std::cout << "Level " << currentLevelIndex + 1 << " loaded. Player: (" << player->getTileX() << "," << player->getTileY() << "), Exit: (" << gameMap.getExitPosition().x << "," << gameMap.getExitPosition().y << ")" << std::endl;
 }
@@ -135,19 +138,20 @@ void GameManager::handleEvents() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
-            running = false; // Oyunu kapatır
+            running = false;
         }
         if (currentGameState == GameState::PLAYING && player) {
             player->handleEvent(event);
         }
-        // Fare ile yol bulma (A* testi)
+
+        // Pathfinding with mouse.
         if (currentGameState == GameState::PLAYING && event.type == SDL_MOUSEBUTTONDOWN) {
             if (event.button.button == SDL_BUTTON_LEFT && player) {
                 int mouseX, mouseY; SDL_GetMouseState(&mouseX, &mouseY);
                 int targetTileX = mouseX / gameMap.getTileSize(); int targetTileY = mouseY / gameMap.getTileSize();
                 if (targetTileX >= 0 && targetTileX < gameMap.getWidth() && targetTileY >= 0 && targetTileY < gameMap.getHeight() && gameMap.getTile(targetTileX, targetTileY).isTraversable()) {
                     SDL_Point startPos = getPlayerTilePos(); SDL_Point endPos = {targetTileX, targetTileY};
-                    currentFoundPath = pathfinder.findPath(startPos, endPos, gameMap, AlgorithmType::ASTAR);
+                    currentFoundPath = pathfinder->findPath(startPos, endPos, gameMap, AlgorithmType::ASTAR);
                 }
             }
         }
@@ -159,8 +163,8 @@ void GameManager::update() {
     SDL_Point oldPlayerPos = {-1,-1}; if(player) oldPlayerPos = getPlayerTilePos();
     if (player) player->update(gameMap);
     bool playerActuallyMoved = false; if (player && (oldPlayerPos.x != player->getTileX() || oldPlayerPos.y != player->getTileY())) playerActuallyMoved = true;
-    if (playerActuallyMoved && player) { playerWavefront = pathfinder.generateWavefrontMap(getPlayerTilePos(), gameMap); }
-    else if (!playerActuallyMoved && player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder.generateWavefrontMap(getPlayerTilePos(), gameMap); }
+    if (playerActuallyMoved && player) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
+    else if (!playerActuallyMoved && player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { setGameState(GameState::GAME_OVER); return; } } }
     if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { setGameState(GameState::LEVEL_COMPLETE); } }
 }

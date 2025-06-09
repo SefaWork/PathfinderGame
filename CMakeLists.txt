@@ -35,6 +35,14 @@ add_executable(PathfinderGame
         source/enemy.cpp
         source/pathingSystem.cpp
         source/movement/wavefrontChase.cpp
+        include/pathfinder.h
+        include/pathfinding/astarpathfinder.h
+        include/pathfinding/bfspathfinder.h
+        include/pathfinding/dijkstraPathfinder.h
+        source/pathfinder.cpp
+        source/pathfinding/astarpathfinder.cpp
+        source/pathfinding/bfsPathfinder.cpp
+        source/pathfinding/dijkstraPathfinder.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})

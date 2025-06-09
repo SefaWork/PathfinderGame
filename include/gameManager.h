@@ -56,7 +56,7 @@ private:
     Player* player;
     std::vector<Enemy*> enemies;
 
-    PathfindingSystem pathfinder;
+    PathfindingSystem* pathfinder;
     Path currentFoundPath;
     WavefrontMap playerWavefront;
 
