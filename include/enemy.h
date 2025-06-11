@@ -4,14 +4,23 @@
 #include "map.h"
 #include "movementStrategy.h"
 
+///
+/// Class representing enemy objects.
+///
 class Enemy {
 public:
     Enemy(int startTileX, int startTileY, int tileSize, int moveDelay = 60);
     ~Enemy();
 
-    void update(const Map& map, const SDL_Point& playerPos, const WavefrontMap* wavefrontMap);
+    void update(const Map& map, const SDL_Point& playerPos);
     void draw(SDL_Renderer* renderer);
+
+    /// Sets the enemy's movement strategy which defines how it should move every movement opportunity.
+    /// @param strategy Pointer to the new strategy.
     void setMovementStrategy(IMovementStrategy* strategy);
+
+    /// Sets the delay (in frames) that the enemy is allowed to move.
+    /// @param delay In frames (60 = 1 second)
     void setMoveDelay(int delay);
 
     [[nodiscard]] int getTileX() const {return xTile;}

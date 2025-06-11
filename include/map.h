@@ -7,9 +7,12 @@
 
 #include "tile.h"
 
+/// Holds and handles current game map.
 class Map {
 public:
     Map();
+
+    /// Loads a new map from given filepath.
     bool loadMap(const std::string& filePath, int tilePixelSize);
     void draw(SDL_Renderer* renderer);
     [[nodiscard]] const Tile& getTile(int x, int y) const;

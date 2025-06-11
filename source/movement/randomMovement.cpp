@@ -1,7 +1,7 @@
 #include "../../include/movement/randomMovement.h"
 #include <vector>
-#include <algorithm> // std::shuffle için
-#include <chrono>    // Zaman tabanlı seed için
+#include <algorithm>
+#include <chrono>
 #include <random>
 
 RandomMovementStrategy::RandomMovementStrategy() {
@@ -9,7 +9,7 @@ RandomMovementStrategy::RandomMovementStrategy() {
     rng = std::mt19937(seed);
 }
 
-SDL_Point RandomMovementStrategy::getNextMovement(const SDL_Point& currentPos, const SDL_Point& targetPos, const Map& gameMap, const WavefrontMap* wavefrontMap) {
+SDL_Point RandomMovementStrategy::getNextMovement(const SDL_Point& currentPos, const SDL_Point& targetPos, const Map& gameMap) {
     SDL_Point directions[] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
     std::vector<SDL_Point> validMoves;
 

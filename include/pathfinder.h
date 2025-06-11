@@ -9,6 +9,7 @@ class PathfindingSystem; // Forward declaration of PathfindingSystem.
 
 using Path = std::vector<SDL_Point>;
 
+/// Abstract class for defining pathfinder behavior.
 class Pathfinder {
 public:
     virtual ~Pathfinder() = default;

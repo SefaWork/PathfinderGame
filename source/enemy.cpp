@@ -33,7 +33,7 @@ void Enemy::setMoveDelay(int delay) {
     moveTimer = 0;
 }
 
-void Enemy::update(const Map& gameMap, const SDL_Point& playerPos, const WavefrontMap* playerWavefrontMap) {
+void Enemy::update(const Map& gameMap, const SDL_Point& playerPos) {
     moveTimer++;
 
     if (moveTimer >= currentMoveDelay) {
@@ -41,31 +41,19 @@ void Enemy::update(const Map& gameMap, const SDL_Point& playerPos, const Wavefro
 
         if (movementStrategy) {
             SDL_Point currentPos = {xTile, yTile};
-            SDL_Point nextMoveTile = movementStrategy->getNextMovement(currentPos, playerPos, gameMap, playerWavefrontMap);
+            SDL_Point nextMoveTile = movementStrategy->getNextMovement(currentPos, playerPos, gameMap);
 
             if (nextMoveTile.x != xTile || nextMoveTile.y != yTile) {
                 if (nextMoveTile.x >= 0 && nextMoveTile.x < gameMap.getWidth() &&
                     nextMoveTile.y >= 0 && nextMoveTile.y < gameMap.getHeight() &&
                     gameMap.getTile(nextMoveTile.x, nextMoveTile.y).isTraversable()) {
 
-                    // Sadece gerçekten hareket ettiğinde logla (isteğe bağlı)
-                    // std::cout << "Enemy MOVING from (" << currentTileX << "," << currentTileY << ") to ("
-                    //           << nextMoveTile.x << "," << nextMoveTile.y << ")" << std::endl;
                     xTile = nextMoveTile.x;
                     yTile = nextMoveTile.y;
                     xPos = xTile * tileSize;
                     yPos = yTile * tileSize;
-                } else {
-                    // Stratejinin önerdiği geçersiz hareket (debug için faydalı olabilir)
-                    // std::cout << "Enemy strategy for (" << currentPos.x << "," << currentPos.y
-                    //           << ") suggested invalid move to (" << nextMoveTile.x << "," << nextMoveTile.y << ")" << std::endl;
                 }
-            } else {
-                 // Strateji hareket önermedi (debug için faydalı olabilir)
-                 // std::cout << "Enemy strategy suggests NO MOVE for enemy at (" << currentPos.x << "," << currentPos.y << ")" << std::endl;
             }
-        } else {
-            // std::cout << "Enemy at (" << currentTileX << "," << currentTileY << ") has NO movement strategy." << std::endl;
         }
     }
 }

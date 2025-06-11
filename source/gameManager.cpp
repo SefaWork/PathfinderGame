@@ -182,7 +182,7 @@ void GameManager::update() {
     bool playerActuallyMoved = false; if (player && (oldPlayerPos.x != player->getTileX() || oldPlayerPos.y != player->getTileY())) playerActuallyMoved = true;
     if (playerActuallyMoved) { score.changeScore(-1); playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     else if (player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
-    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { score.incrementDeath(30); showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy. You lost 30 points.", true); restartLevel(); return; } } }
+    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos()); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { score.incrementDeath(30); showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy. You lost 30 points.", true); restartLevel(); return; } } }
     if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { score.changeScore(100); showDialog(SDL_MESSAGEBOX_INFORMATION, "Level complete!", "You got 100 points as reward.", true); setGameState(GameState::LEVEL_COMPLETE); } }
 }
 
@@ -204,6 +204,7 @@ void GameManager::render() {
 void GameManager::clean() {
     std::cout << "Cleaning up GameManager..." << std::endl;
     delete player; player = nullptr;
+    delete pathfinder; pathfinder = nullptr;
     for (Enemy* enemy : enemies) { delete enemy; } enemies.clear();
     if (renderer) { SDL_DestroyRenderer(renderer); renderer = nullptr; }
     if (window) { SDL_DestroyWindow(window); window = nullptr; }

@@ -2,9 +2,14 @@
 #include <iostream>
 #include <climits>
 
+#include "../../include/gameManager.h"
+
+class GameManager; // Forward declaration of GameManager.
+
 WavefrontChaseMovementStrategy::WavefrontChaseMovementStrategy() = default;
 
-SDL_Point WavefrontChaseMovementStrategy::getNextMovement(const SDL_Point& currentPos, const SDL_Point& targetPos, const Map& gameMap, const WavefrontMap* wavefrontMap) {
+SDL_Point WavefrontChaseMovementStrategy::getNextMovement(const SDL_Point& currentPos, const SDL_Point& targetPos, const Map& gameMap) {
+    WavefrontMap* wavefrontMap = GameManager::GetInstance()->getWavefrontMap();
     if (!wavefrontMap || wavefrontMap->empty() || (*wavefrontMap)[0].empty()) {
         std::cerr << "WavefrontFollowStrategy: Wavefront map is not available or empty for enemy at ("
                   << currentPos.x << "," << currentPos.y << ")" << std::endl;
@@ -55,7 +60,6 @@ SDL_Point WavefrontChaseMovementStrategy::getNextMovement(const SDL_Point& curre
         }
     }
 
-    // Eğer hiçbir komşu mevcut dalga değerinden daha iyi değilse (ve hedefte değilsek), sıkışmışızdır.
     if (bestNextPos.x == currentPos.x && bestNextPos.y == currentPos.y && currentWaveValue != 0) {
          std::cout << "WavefrontFollowStrategy: Enemy at (" << currentPos.x << "," << currentPos.y
                    << ") is STUCK. Current wave: " << currentWaveValue

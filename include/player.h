@@ -9,11 +9,14 @@ class Player {
 public:
     Player(int tilex, int tiley, int tileSize);
 
+    /// Handles SDL_Event for controls.
+    /// @param event Reference to SDL_Event.
     void handleEvent(const SDL_Event& event);
     void update(const Map& gameMap);
     void draw(SDL_Renderer* renderer);
 
     // Getters.
+
     [[nodiscard]] int getX() const {return xPos;}
     [[nodiscard]] int getY() const {return yPos;}
     [[nodiscard]] int getTileX() const {return xTile;}

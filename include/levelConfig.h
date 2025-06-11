@@ -20,10 +20,19 @@ struct EnemySpawnInfo {
     int moveDelay;
 };
 
+/// Struct for level configuration.
 struct LevelConfig {
+
+    /// Filepath for the map file.
     std::string filePath;
+
+    /// Starting position of the player.
     SDL_Point startPos;
+
+    /// Exit position.
     SDL_Point exitPos;
+
+    /// A vector of defined enemies.
     std::vector<EnemySpawnInfo> enemies;
 };
 

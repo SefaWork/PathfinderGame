@@ -16,8 +16,11 @@ enum class GameState {
     GAME_OVER
 };
 
+/// Main singleton class that handles core game features and establishes connections between multiple classes.
 class GameManager {
 public:
+    /// Gets singleton instance.
+    /// @return Pointer to GameManager singleton object.
     static GameManager* GetInstance();
 
     // Singleton should not be cloneable.
@@ -26,6 +29,9 @@ public:
     // Singleton should not be assignable.
     void operator=(const GameManager&) = delete;
 
+    ///
+    /// Starts up the GameManager, setting up core features like the window and begins game loop.
+    ///
     void run();
 
     [[nodiscard]] bool isRunning() const { return running; }
@@ -35,7 +41,13 @@ public:
 
     [[nodiscard]] GameState getCurrentState() const { return currentGameState; }
     [[nodiscard]] Score* getScore() {return &score;}
+    [[nodiscard]] WavefrontMap* getWavefrontMap() {return &playerWavefront;}
 
+    /// Shows a dialog window.
+    /// @param flags SDL dialog window flags.
+    /// @param title Title of the window.
+    /// @param message Message to be displayed.
+    /// @param showScore Whether score/deaths should be shown at the bottom.
     void showDialog(Uint32 flags, const char* title, const char* message, bool showScore);
 private:
     GameManager();
