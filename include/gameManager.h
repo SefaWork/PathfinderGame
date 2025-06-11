@@ -27,27 +27,30 @@ public:
     void operator=(const GameManager&) = delete;
 
     void run();
-    bool initSystems(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
-    void loadLevel(int levelIndex);
-    void goToNextLevel();
-
-    void handleEvents();
-    void update();
-    void render();
-    void clean();
 
     [[nodiscard]] bool isRunning() const { return running; }
     [[nodiscard]] SDL_Renderer* getRenderer() const { return renderer; }
     [[nodiscard]] const Map& getGameMap() const;
     [[nodiscard]] SDL_Point getPlayerTilePos() const;
 
-    void setGameState(GameState newState);
     [[nodiscard]] GameState getCurrentState() const { return currentGameState; }
+    [[nodiscard]] Score* getScore() {return &score;}
 
     void showDialog(Uint32 flags, const char* title, const char* message, bool showScore);
 private:
     GameManager();
     ~GameManager();
+
+    bool initSystems(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+    void loadLevel(int levelIndex);
+    void goToNextLevel();
+    void restartLevel();
+
+    void handleEvents();
+    void update();
+    void render();
+    void clean();
+    void setGameState(GameState newState);
 
     static GameManager* pinstance_;
 

@@ -182,7 +182,7 @@ void GameManager::update() {
     bool playerActuallyMoved = false; if (player && (oldPlayerPos.x != player->getTileX() || oldPlayerPos.y != player->getTileY())) playerActuallyMoved = true;
     if (playerActuallyMoved) { score.changeScore(-1); playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     else if (!playerActuallyMoved && player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
-    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy.", true); setGameState(GameState::GAME_OVER); return; } } }
+    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { score.changeScore(-30); showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy. You lost 30 points.", false); restartLevel(); return; } } }
     if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { score.changeScore(100); setGameState(GameState::LEVEL_COMPLETE); } }
 }
 
@@ -213,4 +213,5 @@ void GameManager::clean() {
 
 const Map& GameManager::getGameMap() const { return gameMap; }
 SDL_Point GameManager::getPlayerTilePos() const { if (player) { return {player->getTileX(), player->getTileY()}; } return {-1, -1}; }
-void GameManager::goToNextLevel() { currentLevelIndex++; currentGameState = GameState::LOADING_LEVEL; currentFoundPath.clear(); }
+void GameManager::goToNextLevel() { currentLevelIndex++; this->restartLevel(); }
+void GameManager::restartLevel() { currentGameState = GameState::LOADING_LEVEL; currentFoundPath.clear(); }
