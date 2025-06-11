@@ -4,6 +4,7 @@
 
 Score::Score() {
     this->score = 0;
+    this->deaths = 0;
 }
 
 void Score::changeScore(int value) {
@@ -15,4 +16,10 @@ void Score::changeScore(int value) {
         this->score += value;
     }
 }
+
+void Score::incrementDeath(int scorePenalty) {
+    this->deaths++;
+    this->changeScore(-scorePenalty);
+}
+
 
