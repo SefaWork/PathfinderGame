@@ -7,6 +7,7 @@
 #include "map.h"
 #include "pathfindingSystem.h"
 #include "player.h"
+#include "score.h"
 
 enum class GameState {
     LOADING_LEVEL,
@@ -42,6 +43,8 @@ public:
 
     void setGameState(GameState newState);
     [[nodiscard]] GameState getCurrentState() const { return currentGameState; }
+
+    void showDialog(Uint32 flags, const char* title, const char* message, bool showScore);
 private:
     GameManager();
     ~GameManager();
@@ -63,6 +66,8 @@ private:
     std::vector<LevelConfig> allLevels;
     int currentLevelIndex;
     GameState currentGameState;
+
+    Score score;
 };
 
 #endif //GAMEMANAGER_H

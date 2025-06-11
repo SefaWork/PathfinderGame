@@ -12,9 +12,6 @@ include_directories(
 )
 
 add_executable(PathfinderGame
-        # Sources
-        source/main.cpp
-
         # Headers
         include/enemy.h
         include/gameManager.h
@@ -26,7 +23,13 @@ add_executable(PathfinderGame
         include/pathfindingSystem.h
         include/movement/randomMovement.h
         include/movement/wavefrontChase.h
+        include/score.h
+        include/pathfinder.h
+        include/pathfinding/astarpathfinder.h
+        include/pathfinding/bfspathfinder.h
+        include/pathfinding/dijkstraPathfinder.h
 
+        # Sources
         source/gameManager.cpp
         source/tile.cpp
         source/player.cpp
@@ -35,14 +38,12 @@ add_executable(PathfinderGame
         source/enemy.cpp
         source/pathingSystem.cpp
         source/movement/wavefrontChase.cpp
-        include/pathfinder.h
-        include/pathfinding/astarpathfinder.h
-        include/pathfinding/bfspathfinder.h
-        include/pathfinding/dijkstraPathfinder.h
         source/pathfinder.cpp
         source/pathfinding/astarpathfinder.cpp
         source/pathfinding/bfsPathfinder.cpp
         source/pathfinding/dijkstraPathfinder.cpp
+        source/score.cpp
+        source/main.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})

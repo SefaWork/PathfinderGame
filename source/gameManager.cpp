@@ -66,10 +66,26 @@ GameManager::~GameManager() {
     for (Enemy* enemy : this->enemies) { delete enemy; } this->enemies.clear();
 }
 
+void GameManager::showDialog(Uint32 flags, const char *title, const char *message, bool showScore) {
+    std::string msg = message;
+
+    if (showScore) {
+        msg = msg + "\n\nScore: " + std::to_string(score.getScore());
+    }
+
+    int result = SDL_ShowSimpleMessageBox(flags, title, msg.c_str(), window);
+    if (result != 0) {
+        // Error!
+        std::cerr << "Error when trying to show dialog: " << SDL_GetError() << std::endl;
+    }
+}
+
+
 void GameManager::loadLevel(int levelIndex) {
     if (levelIndex < 0 || static_cast<size_t>(levelIndex) >= allLevels.size()) {
         if (static_cast<size_t>(levelIndex) >= allLevels.size() && !allLevels.empty()) {
              std::cout << "CONGRATULATIONS! You completed all levels!" << std::endl;
+             showDialog(SDL_MESSAGEBOX_INFORMATION, "Congratulations!", "You completed all the levels!", true);
         } else {
              std::cerr << "Error: Invalid level index or no levels configured." << std::endl;
         }
@@ -152,6 +168,7 @@ void GameManager::handleEvents() {
                 if (targetTileX >= 0 && targetTileX < gameMap.getWidth() && targetTileY >= 0 && targetTileY < gameMap.getHeight() && gameMap.getTile(targetTileX, targetTileY).isTraversable()) {
                     SDL_Point startPos = getPlayerTilePos(); SDL_Point endPos = {targetTileX, targetTileY};
                     currentFoundPath = pathfinder->findPath(startPos, endPos, gameMap, AlgorithmType::ASTAR);
+                    score.changeScore(-20); // score penalty for showing path.
                 }
             }
         }
@@ -163,10 +180,10 @@ void GameManager::update() {
     SDL_Point oldPlayerPos = {-1,-1}; if(player) oldPlayerPos = getPlayerTilePos();
     if (player) player->update(gameMap);
     bool playerActuallyMoved = false; if (player && (oldPlayerPos.x != player->getTileX() || oldPlayerPos.y != player->getTileY())) playerActuallyMoved = true;
-    if (playerActuallyMoved && player) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
+    if (playerActuallyMoved) { score.changeScore(-1); playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     else if (!playerActuallyMoved && player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
-    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { setGameState(GameState::GAME_OVER); return; } } }
-    if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { setGameState(GameState::LEVEL_COMPLETE); } }
+    for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos(), &playerWavefront); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy.", true); setGameState(GameState::GAME_OVER); return; } } }
+    if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { score.changeScore(100); setGameState(GameState::LEVEL_COMPLETE); } }
 }
 
 void GameManager::render() {
