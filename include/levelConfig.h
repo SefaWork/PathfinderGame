@@ -34,6 +34,9 @@ struct LevelConfig {
 
     /// A vector of defined enemies.
     std::vector<EnemySpawnInfo> enemies;
+
+    /// A vector of coin positions.
+    std::vector<SDL_Point> coins;
 };
 
 #endif //LEVELCONFIG_H

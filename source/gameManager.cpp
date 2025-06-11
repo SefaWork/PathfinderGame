@@ -22,11 +22,36 @@ GameManager::GameManager() {
     this->currentLevelIndex = 0;
     this->currentGameState = GameState::LOADING_LEVEL;
 
-    LevelConfig level1; level1.filePath = "maps/level1.txt"; level1.startPos = {3,0}; level1.exitPos = {3,6}; level1.enemies.push_back({3,3, EnemyAI::Behavior::RANDOM, 60}); allLevels.push_back(level1);
-    LevelConfig level2; level2.filePath = "maps/level2.txt"; level2.startPos = {3,0}; level2.exitPos = {3,6}; level2.enemies.push_back({5,1, EnemyAI::Behavior::WAVEFRONT, 60}); allLevels.push_back(level2);
-    LevelConfig level3; level3.filePath = "maps/level3.txt"; level3.startPos = {3,0}; level3.exitPos = {4,8}; level3.enemies.push_back({6,1, EnemyAI::Behavior::WAVEFRONT, 30}); allLevels.push_back(level3);
-    LevelConfig level4; level4.filePath = "maps/level4.txt"; level4.startPos = {3,0}; level4.exitPos = {4,8}; level4.enemies.push_back({5,1, EnemyAI::Behavior::WAVEFRONT, 35}); level4.enemies.push_back({2,5, EnemyAI::Behavior::WAVEFRONT, 40}); allLevels.push_back(level4);
-    LevelConfig level5; level5.filePath = "maps/level5.txt"; level5.startPos = {6,1}; level5.exitPos = {4,9}; level5.enemies.push_back({5,0, EnemyAI::Behavior::WAVEFRONT, 15}); level5.enemies.push_back({6,6, EnemyAI::Behavior::WAVEFRONT, 10}); level5.enemies.push_back({9,8, EnemyAI::Behavior::RANDOM, 45}); allLevels.push_back(level5);
+    LevelConfig level1; level1.filePath = "maps/level1.txt"; level1.startPos = {3,0}; level1.exitPos = {3,6}; level1.enemies.push_back({3,3, EnemyAI::Behavior::RANDOM, 60});
+    LevelConfig level2; level2.filePath = "maps/level2.txt"; level2.startPos = {3,0}; level2.exitPos = {3,6}; level2.enemies.push_back({5,1, EnemyAI::Behavior::WAVEFRONT, 60});
+    LevelConfig level3; level3.filePath = "maps/level3.txt"; level3.startPos = {3,0}; level3.exitPos = {4,8}; level3.enemies.push_back({6,1, EnemyAI::Behavior::WAVEFRONT, 30});
+    LevelConfig level4; level4.filePath = "maps/level4.txt"; level4.startPos = {3,0}; level4.exitPos = {4,8}; level4.enemies.push_back({5,1, EnemyAI::Behavior::WAVEFRONT, 35}); level4.enemies.push_back({2,5, EnemyAI::Behavior::WAVEFRONT, 40});
+    LevelConfig level5; level5.filePath = "maps/level5.txt"; level5.startPos = {6,1}; level5.exitPos = {4,9}; level5.enemies.push_back({5,0, EnemyAI::Behavior::WAVEFRONT, 15}); level5.enemies.push_back({6,6, EnemyAI::Behavior::WAVEFRONT, 10}); level5.enemies.push_back({9,8, EnemyAI::Behavior::RANDOM, 45});
+
+    level1.coins.push_back({5,1});
+    level1.coins.push_back({5,2});
+    level1.coins.push_back({5,4});
+    level1.coins.push_back({5,5});
+
+    level2.coins.push_back({1, 3});
+    level2.coins.push_back({1, 4});
+    level2.coins.push_back({1, 5});
+
+    level3.coins.push_back({1,5});
+    level3.coins.push_back({2,5});
+    level3.coins.push_back({2,6});
+    level3.coins.push_back({2,7});
+    level3.coins.push_back({1,7});
+
+    level5.coins.push_back({6,8});
+    level5.coins.push_back({7,8});
+    level5.coins.push_back({8,8});
+
+    allLevels.push_back(level1);
+    allLevels.push_back(level2);
+    allLevels.push_back(level3);
+    allLevels.push_back(level4);
+    allLevels.push_back(level5);
 }
 
 bool GameManager::initSystems(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
@@ -100,6 +125,7 @@ void GameManager::loadLevel(int levelIndex) {
     }
     delete player; player = nullptr;
     for (Enemy* e : enemies) { delete e; } enemies.clear();
+    for (Coin* c : coins) {delete c;} coins.clear();
     currentFoundPath.clear();
     if (config.startPos.x >= 0 && config.startPos.x < gameMap.getWidth() && config.startPos.y >= 0 && config.startPos.y < gameMap.getHeight() && gameMap.getTile(config.startPos.x, config.startPos.y).isTraversable()) {
         player = new Player(config.startPos.x, config.startPos.y, gameMap.getTileSize());
@@ -114,6 +140,10 @@ void GameManager::loadLevel(int levelIndex) {
             }
             enemies.push_back(newEnemy);
         } else { std::cerr << "Could not place enemy on level " << levelIndex+1 << ". Check map/config." << std::endl; }
+    }
+    for (const SDL_Point& spawnPos : config.coins) {
+        Coin* coin = new Coin(spawnPos.x, spawnPos.y, gameMap.getTileSize());
+        coins.push_back(coin);
     }
     if (player) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     setGameState(GameState::PLAYING);
@@ -186,6 +216,7 @@ void GameManager::update() {
     if (playerActuallyMoved) { score.changeScore(-1); playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     else if (player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos()); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { score.incrementDeath(30); showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy. You lost 30 points.", true); restartLevel(); return; } } }
+    for (Coin* coin : coins) {coin->update({player->getTileX(), player->getTileY()}); }
     if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { score.changeScore(100); showDialog(SDL_MESSAGEBOX_INFORMATION, "Level complete!", "You got 100 points as reward.", true); setGameState(GameState::LEVEL_COMPLETE); } }
 }
 
@@ -200,6 +231,7 @@ void GameManager::render() {
         }
     }
     for (Enemy* enemy : enemies) { if (enemy) { enemy->draw(renderer); } }
+    for (Coin* coin : coins) { coin->draw(renderer); }
     if (player) { player->draw(renderer); }
     SDL_RenderPresent(renderer);
 }
@@ -209,6 +241,7 @@ void GameManager::clean() {
     delete player; player = nullptr;
     delete pathfinder; pathfinder = nullptr;
     for (Enemy* enemy : enemies) { delete enemy; } enemies.clear();
+    for (Coin* coin : coins) {delete coin;} coins.clear();
     if (renderer) { SDL_DestroyRenderer(renderer); renderer = nullptr; }
     if (window) { SDL_DestroyWindow(window); window = nullptr; }
     SDL_Quit();

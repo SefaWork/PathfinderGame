@@ -44,6 +44,8 @@ add_executable(PathfinderGame
         source/pathfinding/dijkstraPathfinder.cpp
         source/score.cpp
         source/main.cpp
+        include/coin.h
+        source/coin.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})

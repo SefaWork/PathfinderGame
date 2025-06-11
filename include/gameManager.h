@@ -2,6 +2,7 @@
 #define GAMEMANAGER_H
 #include <SDL.h>
 
+#include "coin.h"
 #include "enemy.h"
 #include "levelConfig.h"
 #include "map.h"
@@ -73,6 +74,7 @@ private:
     Map gameMap;
     Player* player;
     std::vector<Enemy*> enemies;
+    std::vector<Coin*> coins;
 
     PathfindingSystem* pathfinder;
     Path currentFoundPath;
