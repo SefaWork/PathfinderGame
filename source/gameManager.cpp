@@ -117,6 +117,9 @@ void GameManager::loadLevel(int levelIndex) {
     }
     if (player) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     setGameState(GameState::PLAYING);
+
+    SDL_SetWindowSize(window, gameMap.getWidth() * gameMap.getTileSize(), gameMap.getHeight() * gameMap.getTileSize());
+
     std::cout << "Level " << currentLevelIndex + 1 << " loaded. Player: (" << player->getTileX() << "," << player->getTileY() << "), Exit: (" << gameMap.getExitPosition().x << "," << gameMap.getExitPosition().y << ")" << std::endl;
 }
 
