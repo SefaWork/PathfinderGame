@@ -216,7 +216,7 @@ void GameManager::update() {
     if (playerActuallyMoved) { score.changeScore(-1); playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     else if (player && playerWavefront.empty() && gameMap.getWidth() > 0) { playerWavefront = pathfinder->generateWavefrontMap(getPlayerTilePos(), gameMap); }
     for (Enemy* enemy : enemies) { if (enemy && player && !playerWavefront.empty()) { enemy->update(gameMap, getPlayerTilePos()); if (enemy->getTileX() == player->getTileX() && enemy->getTileY() == player->getTileY()) { score.incrementDeath(30); showDialog(SDL_MESSAGEBOX_ERROR, "Game Over!", "You bumped with an enemy. You lost 30 points.", true); restartLevel(); return; } } }
-    for (Coin* coin : coins) {coin->update({player->getTileX(), player->getTileY()}); }
+    for (Coin* coin : coins) { if (player) coin->update({player->getTileX(), player->getTileY()}); }
     if (player) { SDL_Point exitPos = gameMap.getExitPosition(); if (exitPos.x != -1 && player->getTileX() == exitPos.x && player->getTileY() == exitPos.y) { score.changeScore(100); showDialog(SDL_MESSAGEBOX_INFORMATION, "Level complete!", "You got 100 points as reward.", true); setGameState(GameState::LEVEL_COMPLETE); } }
 }
 
