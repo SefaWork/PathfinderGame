@@ -54,17 +54,43 @@ private:
     GameManager();
     ~GameManager();
 
+    /// Initializes window and renderer.
+    /// @param title Window title
+    /// @param xpos Window x pos
+    /// @param ypos Window y pos
+    /// @param width Window width
+    /// @param height Window height
+    /// @param fullscreen Fullscreen
+    /// @return TRUE if successful, FALSE if errored
     bool initSystems(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+
+    /// Loads level from index.
+    /// @param levelIndex Index to load
     void loadLevel(int levelIndex);
+
+    /// Loads the next level.
     void goToNextLevel();
+
+    /// Restarts the current level.
     void restartLevel();
 
+    /// Handles events.
     void handleEvents();
+
+    /// Updates player, enemies and coins.
     void update();
+
+    /// Renders all.
     void render();
+
+    /// Cleans game in preparation for destruction.
     void clean();
+
+    /// Sets game state.
+    /// @param newState New state
     void setGameState(GameState newState);
 
+    /// Static singleton instance.
     static GameManager* pinstance_;
 
     bool running;

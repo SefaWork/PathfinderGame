@@ -13,7 +13,13 @@ public:
     Map();
 
     /// Loads a new map from given filepath.
+    /// @param filePath File to load.
+    /// @param tilePixelSize How many pixels each tile should be.
+    /// @return TRUE if successful, FALSE if errored.
     bool loadMap(const std::string& filePath, int tilePixelSize);
+
+    /// Draws all tiles.
+    /// @param renderer Renderer pointer.
     void draw(SDL_Renderer* renderer);
     [[nodiscard]] const Tile& getTile(int x, int y) const;
     [[nodiscard]] SDL_Point getExitPosition() const;
